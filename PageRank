@@ -1,0 +1,146 @@
+import java.awt.List;
+import java.io.BufferedReader;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+
+public class PageRank8164 {
+	static BufferedReader reader;
+	static String s;
+	static int iter;
+
+	public static void main(String args[]) throws IOException{
+		iter = Integer.parseInt(args[0]);
+		int init = Integer.parseInt(args[1]);
+		double d=0.85;
+		String filename = args[2];
+		reader = new BufferedReader(new FileReader(filename));
+		s = reader.readLine();
+		int size = Integer.parseInt(s.split(" ")[0]);
+		ArrayList<Node> nodes = new ArrayList<Node>(size);
+		InitValue(init,size,nodes);
+		while((s = reader.readLine())!= null){
+			int a = Integer.parseInt(s.split(" ")[0]);
+			int b = Integer.parseInt(s.split(" ")[1]);
+			nodes.get(b).incoming.add(a);
+			nodes.get(a).outgoing.add(b);
+		}
+
+		if(iter>0){
+			for(int k=0; k<=iter;k++){
+				double NewValue[] = new double[size];	
+				for(Node n : nodes){
+					double val1 = 0.0;
+					for(int i : n.incoming)
+					{
+						val1+=(nodes.get(i).pagerank)/(nodes.get(i).outgoing.size());
+					}
+					double val2=(1-d)/size;
+					NewValue[nodes.indexOf(n)]=val2+(d*val1);
+				}
+				for(int i=0; i<size; i++)
+				{
+					nodes.get(i).pagerank=NewValue[i];
+				}
+				int i=0;
+				for(Node n : nodes)
+				{
+					System.out.printf(" Iter:" + (k+1) +":  " + "P["+(++i)+"] %.7f" ,+ n.pagerank);	
+				}
+				System.out.println("");
+			}
+
+
+		}
+		else{
+			double NewValue[] = new double[size];
+			double prevValues[] = new double[size];
+			double eVal = Math.pow(10, iter);	
+			int k =1;
+			boolean b;
+			do{
+				b = true;
+				for(Node n : nodes){
+					prevValues[nodes.indexOf(n)] = n.pagerank;
+				}
+				for(Node n : nodes){
+					double val1 = 0.0;
+					for(int i : n.incoming)
+					{
+						val1+=(nodes.get(i).pagerank)/(nodes.get(i).outgoing.size());
+					}
+					double val2=(1-d)/size;
+					NewValue[nodes.indexOf(n)]=val2+(d*val1);
+				}
+				for(int i=0; i<size; i++)
+				{
+					nodes.get(i).pagerank=NewValue[i];
+				}
+				int i=0;
+				for(Node n : nodes)
+				{
+					System.out.printf(" Iter:" + (k) +":  " + "P["+(++i)+"] %.7f" ,+ n.pagerank);	
+				}
+				System.out.println("");
+				k++;
+				double[] arr = new double[size];
+				for(int i1=0; i1<arr.length; i1++)
+				{
+					arr[i1]=Math.abs(prevValues[i1] - nodes.get(i1).pagerank);
+				}
+				for(int i1=0;i1<size;i1++){
+					if(arr[i1]<eVal){
+						b = true;
+					}
+					else{
+						b=false;
+						break;
+					}
+				}
+			}while(!b);
+		}
+	}
+
+
+	private static void InitValue(int init, int size, ArrayList<Node> nodes) {
+		double initV = 0.0;
+		if(init==0){
+			initV = 1/(double)size;
+			iter = -5;
+		}
+		else if(init==1){
+			initV = 1;
+		}
+		else if(init == -1){
+			initV = 1/(double)size;
+		}
+		else if(init== 2){
+			initV = 1/(Math.sqrt((double)size));
+		}
+		for(int i=0;i<size;i++)
+		{
+			nodes.add(new Node());
+			nodes.get(i).pagerank=initV;
+
+		}
+
+
+	}
+
+
+
+}
+
+class Node{
+	double pagerank=0.0;
+	ArrayList<Integer> incoming;
+	ArrayList<Integer> outgoing;
+
+	public Node()
+	{
+		incoming = new ArrayList<Integer>(1);
+		outgoing = new ArrayList<Integer>(1);
+	}
+
+}
