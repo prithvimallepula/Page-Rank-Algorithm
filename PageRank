@@ -5,10 +5,12 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.util.ArrayList;
 
+
 public class PageRank8164 {
 	static BufferedReader reader;
 	static String s;
 	static int iter;
+	static int test;
 
 	public static void main(String args[]) throws IOException{
 		iter = Integer.parseInt(args[0]);
